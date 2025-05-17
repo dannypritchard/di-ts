@@ -7,16 +7,10 @@ export function Injectable<T>(token?: Constructor<T>) {
 }
 
 export function Inject<T>(token: Constructor<T>) {
-    return (
-        target: Object,
-        propertyKey: string | symbol,
-        parameterIndex?: number
+    return <K extends PropertyKey>(
+        target: { [P in K]: T },
+        propertyKey: K
     ): void => {
-        const ctor = target.constructor as Constructor<unknown>;
-        if (typeof parameterIndex === 'number') {
-            Container.recordMethodInjection(ctor, propertyKey, parameterIndex, token);
-        } else {
-            Container.recordInjection(ctor, propertyKey, token);
-        }
+        Container.recordInjection(target.constructor as Constructor<unknown>, propertyKey, token);
     };
 }

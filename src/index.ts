@@ -13,23 +13,24 @@ class LoggerService {
 }
 
 @Injectable()
-export class UserService {
-    private logger!: ILoggerService;
-
-    // also viable
-    // @Inject(LoggerService) private logger!: ILoggerService;
-
-    construct(
-        @Inject(LoggerService) logger: ILoggerService,
-    ) {
-        this.logger = logger;
-    }
-
-    doWork() {
-        this.logger.log('the user service is doing some work');
+class BadService {
+    incompatible(): void {
+        console.log('I am not a logger');
     }
 }
 
+@Injectable()
+class UserService {
+    @Inject(LoggerService)
+    public logger!: ILoggerService;
 
-const userService = Container.resolve(UserService);
-console.log(userService.doWork());
+    // @Inject(BadService) public logger2!: ILoggerService; // fails
+
+    getUser() {
+        this.logger.log('fetching user...');
+        return { id: 1, name: 'Alice' };
+    }
+}
+
+const userSvc = Container.resolve(UserService);
+console.log(userSvc.getUser());
